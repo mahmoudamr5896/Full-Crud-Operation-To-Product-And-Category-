@@ -1,0 +1,309 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff; /* Primary color from Bootstrap */
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0062cc;
+}
+
+.btn-danger {
+  background-color: #dc3545; /* Danger color from Bootstrap */
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+input,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+#category-list{
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border-color: #007bff; /* Primary color from Bootstrap */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+input:focus,
+textarea:focus {
+  border-color: #007bff; /* Primary color from Bootstrap */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5; /* Adjust as needed */
+}
+
+.container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff; /* Adjust as needed */
+  border-radius: 5px; /* Optional for rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional for shadow */
+}
+
+</style>
+    </head>
+    <body>
+        <!-- start input  -->
+        <div class="w-75 mx-auto p-5 m-5 shadow-lg">
+            <h1>Add Product</h1>
+            <label>productName:</label>
+            <input type="text" onblur="validateProduct()" class="form-control mb-3" id="productName"  placeholder="Product Name ....">
+            
+            <label for="img">Add Img</label>
+            <input type="file" id="img" >
+            <label>productCategory:</label>
+            <select name="" id="category-list">
+
+            </select>
+            <!-- <input type="text" class="form-control mb-3" id="" onblur="validateProduct()"  placeholder="Categories ... " >
+            --><label>productPrice:</label> 
+            <input type="number" class="form-control mb-3" id="productPrice" onblur=" validateProduct()"  placeholder="3000 ">
+            <label>productDescription</label>
+            <textarea class="form-control mb-3" id="productDesc" onblur="validateProduct()"  placeholder="search..." ></textarea>
+            <label for="stockQuantity">stockQuantity</label>
+            <input type="number" id="Stock">
+            <button  class="btn btn-primary" id="addProduct">AddProduct</button>
+            <button class="btn btn-danger" onclick="clearForm()">clear</button>
+        </div>
+         <!-- end input -->
+         <!-- start search -->
+        <input onkeyup="searchProdct()"  id="searchValue" type="text" placeholder="search..." class="form-control my-5 w-50 mx-auto">
+    <!-- end search -->
+    <!-- start table -->
+        <table class="table w-75 mx-auto">
+          <thead>
+              <th>index</th>
+              <th>name</th>
+              <th>imgs</th>
+              <th>price</th>
+              <th>productCategory </th>
+              <th>desc</th>
+              <th>stockQuantity</th>
+              <th>update</th>
+              <th>delete</th>
+          </thead>
+          <tbody id="tableBody">
+        
+       
+          </tbody>
+        <!-- end table -->
+
+    <script>
+var productName = document.getElementById('productName');
+var productImg = document.getElementById("img");
+var productCategory = document.getElementById('category-list')
+var productPrice = document.getElementById('productPrice')
+var productDesc = document.getElementById('productDesc')
+var productStock = document.getElementById('Stock')
+var searchValue = document.getElementById('searchValue')
+var addBtn = document.getElementById('addProduct')
+var currentIndex= 0;
+//  localStorage
+if(localStorage.getItem('allproduct')== null){
+  var productContainer=[]
+}else{
+  var productContainer = JSON.parse(localStorage.getItem('allproduct'))
+  display()
+}
+//-------------------------------------------------------------------------------------------
+// update
+addBtn.onclick=function(){
+  if(validateProduct() == true || productName.value !='' || productCategory.value != '' || productDesc.value != '' || productPrice.value !='' ){
+    if(addBtn.innerHTML == 'AddProduct'){
+      createProduct()
+    }else{
+      updateProdct()
+    }
+  
+    localStorage.setItem('allproduct',JSON.stringify(productContainer))
+    clearForm()
+    display()
+  }else{
+    alert('not Valid')
+  }
+
+}
+//  create
+function createProduct(){
+var product ={
+  pname:productName.value,
+  pimg :productImg.value,
+  price : productPrice.value,
+  category:productCategory.value,
+  desc:productDesc.value,
+  Stock:productStock.value
+
+}
+productContainer.push(product)
+}
+
+// getProductInfo
+function getProductInfo(index){ 
+  currentIndex =index;
+  productName.value= productContainer[index].pname;
+  productImg.files[0]= productContainer[index].pimg;
+  productPrice.value=productContainer[index].price;
+  productCategory.value=productContainer[index].category;
+  productDesc.value=productContainer[index].desc;
+  productStock.value=productContainer[index].Stock;
+  addBtn.innerHTML ='updateProduct'
+  }
+// start update
+  function updateProdct(){
+  var product ={
+  pname:productName.value,
+  pimg :productImg.files[0],
+  price : productPrice.value,
+  category:productCategory.value,
+  desc:productDesc.value,
+  Stock:productStock.value
+    }
+  productContainer[currentIndex] = product;
+  addBtn.innerHTML ='AddProduct';
+  }
+  
+
+// start clear
+function clearForm(){
+  productName.value='';
+  productImg.value='';
+  productPrice.value='';
+  productCategory.value='';
+  productDesc.value='';
+  productStock.value='';
+}
+
+
+//  start display
+function display(){ 
+  var trs='';
+  for(var i =0 ; i<productContainer.length;i++){
+    trs +=`<tr>
+    <td>${i+1}</td>
+    <td>${productContainer[i].pname}</td>
+    <td>${productContainer[i].pimg}</td>
+    <td>${productContainer[i].price}</td>
+    <td>${productContainer[i].category}</td>
+    <td>${productContainer[i].desc}</td>
+    <td>${productContainer[i].Stock}</td>
+    <td>
+      <button class="btn btn-info" onclick="getProductInfo(${i})" ><i class="fa fa-solid fa-edit"></i></button>
+    </td>
+    <td>
+ 
+      <button class="btn btn-danger" onclick="delet(${i})"><i class="fa-solid fa-trash"></i></button>
+    </td>
+  </tr>`
+  }
+  document.getElementById('tableBody').innerHTML=trs
+}
+// start delete
+function delet(index){
+console.log(index)
+productContainer.splice(index,1)
+console.log(productContainer)
+localStorage.setItem('allproduct',JSON.stringify(productContainer))
+display()
+}
+// start search
+function searchProdct(){
+var trs='';
+for(var i =0 ; i<productContainer.length;i++){
+  if(productContainer[i].pname.toLowerCase().includes(searchValue.value.toLowerCase()) 
+  || productContainer[i].price.toLowerCase().includes(searchValue.value.toLowerCase()) 
+|| productContainer[i].category.toLowerCase().includes(searchValue.value.toLowerCase()) 
+|| productContainer[i].desc.toLowerCase().includes(searchValue.value.toLowerCase()))
+  {
+    trs +=`<tr>
+    <td>${i+1}</td>
+    <td>${productContainer[i].pname}</td>
+    <td>${productContainer[i].pimg}</td>
+    <td>${productContainer[i].price}</td>
+    <td>${productContainer[i].category}</td>
+    <td>${productContainer[i].desc}</td>
+    <td>${productContainer[i].Stock}</td>
+    <td>
+      <button class="btn btn-info" onclick="getProductInfo(${i})"><i class="fa fa-solid fa-edit"></i></button>
+    </td>
+    <td>
+      <button class="btn btn-danger" onclick="delet(${i})"><i class="fa-solid fa-trash"></i></button>
+    </td>
+  </tr>`
+  }
+
+}
+document.getElementById('tableBody').innerHTML=trs
+}
+
+
+function validateProduct(){
+ var pname =productName.value;
+var price = productPrice.value;
+ var category=productCategory.value;
+  var pnameRegex = /^[A-Z][a-z]{1,10}$/;
+  var priceRegex= /[0-9]{1,5}$/;
+  var categoryRegex =/^[A-Z][a-z]{3,10}$/;
+  if( categoryRegex.test(category) == true && pnameRegex.test(pname) == true && priceRegex.test(price) == true   ){
+     return true;
+  }else{
+    return false;
+  }
+}
+    </script>
+    <script src="category.js"></script>
+</body>
+</html>
